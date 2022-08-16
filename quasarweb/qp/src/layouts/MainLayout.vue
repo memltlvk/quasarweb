@@ -1,10 +1,10 @@
 <template>
   <div style="background-image: url('/assets/logistics_bg.jpg')">
-    <q-layout view="hHh LpR fFf">
-      <q-header elevated class="bg-transparent">
+    <q-layout view="hhh lpr fff">
+      <q-header elevated class="bg-accent" style="border: 1px solid red">
         <q-toolbar class="top-toolbar">
           <q-btn
-            class="text-accent"
+            class="text-white"
             dense
             flat
             round
@@ -25,12 +25,12 @@
             <q-btn
               v-for="navlink in navlinks"
               :key="navlink.no"
-              class="tp-menu"
+              class="text-black tp-menu"
               :icon="navlink.icon"
               :label="navlink.label"
               stack
               glossy
-              color="purple"
+              color="white"
               size="sm"
               :to="navlink.link"
             />
@@ -39,7 +39,7 @@
           <div style="width: 10px">&nbsp;</div>
 
           <q-btn
-            class="text-accent"
+            class="text-white"
             dense
             flat
             round
@@ -143,6 +143,9 @@
         </q-toolbar>
       </q-footer>
     </q-layout>
+
+    <!-- resize observer for the div -->
+    <!-- <q-resize-observer @resize="onDivResize" /> -->
   </div>
 </template>
 
@@ -221,6 +224,11 @@ export default defineComponent({
 
     const copyright = "Carrier Cargo";
 
+    function onDivResize(size) {
+      leftDrawerOpen.value = false;
+      rightDrawerOpen.value = false;
+    }
+
     return {
       viewport,
 
@@ -235,6 +243,8 @@ export default defineComponent({
       },
 
       navlinks,
+
+      onDivResize,
 
       cname,
       address,
@@ -276,7 +286,7 @@ $purplebglt: radial-gradient(
 
 .top-toolbar {
   width: 100%;
-  background: radial-gradient(circle, lighten($warning, 20%) 0%, $warning 100%);
+  background: transparent;
   color: white;
 }
 
@@ -304,6 +314,7 @@ $purplebglt: radial-gradient(
 
 .tp-menu {
   width: 6rem;
+  background-color: white;
 }
 
 .material-icons {
