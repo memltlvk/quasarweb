@@ -1,10 +1,9 @@
 <template>
   <q-card id="mainCard" class="persons-card">
     <div class="person-card-section">
+
       <div class="person-image-div">
-        <q-card class="person-image">
-          <img :src="person.image" class="person-image" />
-        </q-card>
+          <q-img :src="person.image" class="person-image" />
       </div>
 
       <div class="info-div">
@@ -58,9 +57,11 @@ import { defineComponent, ref, onMounted, onUnmounted } from "vue";
 
 import { useQuasar, colors } from "quasar";
 
+import { functionExec } from "./functions.js";
+
 import _ from "lodash";
 
-import cssStructure from "./css/cssStructure.json";
+import cssData from "./css/cssStructure.json";
 
 export default defineComponent({
   name: "PersonCardComponent",
@@ -124,129 +125,56 @@ export default defineComponent({
       }
     }
 
-    // function getBreakpointMeta() {
-    //   const el = document.getElementById("mainCard");
-    //   const cssobj = window.getComputedStyle(el, ":before");
-
-    //   return JSON.parse(JSON.parse(cssobj.content));
-    // }
-
     function onCardResize(size) {
       cardWidth.value = size.width / props.displayArea["font-size"];
 
-      console.log("resized cardWidth = ", cardWidth.value);
+      // console.log("\n---------------");
+      // console.log("screen width = ", ($q.screen.width / 16));
+      // console.log("resized cardWidth =", cardWidth.value);
+      // console.log("---------------\n");
 
-      const breakpointData = cssStructure.cssData;
-      // console.log("breakpoint data = ", breakpointData);
+      // console.log("cssData =", cssData);
 
-      void documentUpdateDim(breakpointData, cardWidth.value);
+      void documentUpdateDim(cardWidth.value);
     }
 
-    function fny(x, x1, x2, y1, y2) {
-      // Line function
-      let slope = (y2 - y1) / (x2 - x1);
-      let constant = y1 - slope * x1;
+    function documentUpdateDim(baseParameter) {
+      // update the document with the current cssData variables
 
-      return slope * x + constant;
-    }
+      // loop through the datasets and select the correct dataset
+      for (let i = 0; i < cssData.datasets.length; ++i) {
+        let currentItem = cssData.datasets[i];
 
-    function calcsetDim(
-      cssClass,
-      cssVariable,
-      baseParameterValue,
-      cssVariableValueMin,
-      cssVariableValueMax,
-      baseParameterValueMin,
-      baseParameterValueMax
-    ) {
-      // calculate the cssProperty and set the same in the document
+        if ((baseParameter >= currentItem.minBaseParameterValue) &&
+            (baseParameter <= currentItem.maxBaseParameterValue)) {
+          // dataset found
+          // console.log("found dataset =", currentItem.name);
 
-      // calculate the cssVariable value
-      let cssVariableValue = 0;
+          // loop through the vars
+          currentItem.vars.forEach(function(varval) {
+            // console.log("varval =",varval);
 
-      if (baseParameterValueMin === baseParameterValueMax) {
-        // base parameter range is constant
-        cssVariableValue = cssVariableValueMin;
-      } else {
-        cssVariableValue = fny(
-          baseParameterValue,
-          baseParameterValueMin,
-          baseParameterValueMax,
-          cssVariableValueMin,
-          cssVariableValueMax
-        );
-      }
+            // call the function to find the current value
+            let CurrentCssClass = cssData["cssVariables"][varval.var]["cssClass"];
+            let currentValue = functionExec(varval.fname,varval.fparams,baseParameter);
 
-      // console.log("***********************");
-      // console.log("cssClass = ", cssClass);
-      // console.log("cssVariable = ", cssVariable);
-      // console.log("baseParameterValue = ", baseParameterValue);
-      // console.log("cssVariableValueMin = ", cssVariableValueMin);
-      // console.log("cssVariableValueMax = ", cssVariableValueMax);
-      // console.log("baseParameterValueMin = ", baseParameterValueMin);
-      // console.log("baseParameterValueMax = ", baseParameterValueMax);
-      // console.log("cssVariableValue = ", cssVariableValue);
-      // console.log("***********************");
+            // set the current value into to css variable in the document
+            const elems = document.getElementsByClassName(CurrentCssClass);
 
-      const cssVariableValueString = cssVariableValue.toString() + "rem";
+            // console.log("cssClass =", CurrentCssClass);
+            // console.log("--"+ varval.var," = ",currentValue);
 
-      // set the cssVariable value in the document
-      const elems = document.getElementsByClassName(cssClass);
-
-      for (let i = 0; i < elems.length; i++) {
-        elems[i].style.setProperty(
-          cssVariable,
-          cssVariableValueString,
-          "important"
-        );
-        // console.log(`Setting ${cssVariable}: ${cssVariableValueString};`);
-        // console.log("elem = ", elems[i]);
-      }
-    }
-
-    function findDataset() {
-      // get the current dataset from ::before class content
-      const el = document.getElementById("mainCard");
-      let dataset = window.getComputedStyle(el, "::before").content;
-
-      dataset = dataset.substr(1, dataset.length - 2);
-
-      console.log("current dataset = ", dataset);
-
-      return dataset;
-    }
-
-    function documentUpdateDim(cssData, baseParameterValue) {
-      // update the document with the current cssData
-
-      // get the base parameter and its values
-      const baseParameterClassData = _.chain(cssData)
-        .filter({ cssClass: "__base_parameter" })
-        .value();
-
-      let dataset = findDataset();
-
-      const baseParameters = baseParameterClassData[0][dataset].split(",");
-
-      // loop through the cssData
-      cssData.forEach(function (val) {
-        // ignore __base-parameter class
-        if (val.cssClass !== "__base_parameter") {
-          // calculate and update dim
-
-          const classParameters = val[dataset].split(",");
-
-          void calcsetDim(
-            val.cssClass,
-            val.cssVariable,
-            baseParameterValue,
-            parseFloat(classParameters[0]),
-            parseFloat(classParameters[1]),
-            baseParameters[0],
-            baseParameters[1]
-          );
+            for (let i = 0; i < elems.length; i++) {
+              elems[i].style.setProperty(
+                "--" + varval.var,
+                currentValue,
+                "important"
+              );
+            }
+          })
+          break;
         }
-      });
+      }
     }
 
     onMounted(() => {
@@ -255,10 +183,9 @@ export default defineComponent({
 
     return {
       onCardResize,
-      calcsetDim,
       documentUpdateDim,
     };
-  },
+  }
 });
 </script>
 
@@ -276,5 +203,239 @@ $accentbg: radial-gradient(circle, lighten($accent, 5%) 0%, $accent 100%);
 
 // **********
 
-@import "css/autogenerated";
+/* ***** Variables Declaration Start ***** */
+
+        .persons-card {
+          --backgroundImageFile: url("/assets/personal-card.png");
+        }
+        .person-card-section {
+          --normalFontSize: 0.7rem;
+          --cardTopPadding: 2.5rem;
+          --cardBottomPadding: 2.5rem;
+          --cardLeftPadding: 1rem;
+          --cardRightPadding: 1rem;
+          }
+
+        .person-image-div {
+          --imageDivWidth: 6rem;
+          --personImageDivFlexValue: 100%;
+          }
+
+        .person-image {
+          --imageWidth: 4.5rem;
+          }
+
+        .info-div {
+          --infoDivFlexValue: 100%;
+        }
+
+        .person-info-div {
+          --infodivTopMargin: 1.3rem;
+          --infodivBottomMargin: 0.7rem;
+          }
+
+        .person-contact-div {
+          --personContactDivPaddingLeft: 0rem;
+        }
+
+        .person-name {
+          --personNameFontSize: 1rem;
+          }
+
+        .separator {
+          --separatorMarginTop: 0rem;
+          --separatorMarginBottom: 0rem;
+          }
+
+        .icon-style {
+          --iconFontSize: 1.2rem;
+          }
+
+        .phone-div {
+          --phonedivBottomMargin: 0rem;
+          }
+
+        .email-div{
+          --emailDivDisplayValue: flex;
+        }
+
+        .email-div-full-span {
+          --emailDivFullSpanDisplayValue: none;
+        }
+
+/* ***** Variables Declaration End ***** */
+
+/* ***** Default Settings Start ***** */
+.persons-card {
+  background-image: url("/assets/personal-card.png");
+  background-size: cover;
+
+  width: 100%;
+
+  max-width: 30rem;
+  min-width: 14rem;
+
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+.person-card-section {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+
+  justify-content: center;
+  align-content: center;
+
+  justify-items: center;
+  align-items: center;
+
+  text-align: center;
+  font-weight: bold;
+  color: $accent;
+
+  row-gap: 1rem;
+  column-gap: 1rem;
+}
+
+.person-image-div {
+  z-index: 3;
+
+  flex: 100%;
+
+  align-self: center;
+  justify-self: center;
+
+  width: 4.5rem;
+}
+
+.person-image {
+  z-index: 4;
+
+  flex: 100%;
+
+  width: 4.5rem;
+}
+
+.info-div {
+  flex: 100%;
+}
+
+.person-info-div {
+  flex: 100%;
+  z-index: 1;
+}
+
+.person-name {
+  font-weight: bold;
+}
+
+.person-title {
+  font-weight: bold;
+}
+
+.person-contact-div {
+  flex: 100%;
+
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+
+  padding-left: 0rem;
+}
+
+// .icon-style {
+// }
+
+.phone-div {
+  flex: 100%;
+}
+
+.email-div {
+  display: flex;
+
+  flex: 100%;
+
+  justify-content: center;
+  align-items: center;
+
+  text-align: center;
+
+  hyphens: auto;
+}
+
+.email-div-full-span {
+  display: none;
+
+  flex: 100%;
+
+  justify-content: center;
+  align-items: center;
+}
+
+/* ***** Default Settings End ***** */
+
+/* ***** Variables Application Start ***** */
+
+        .persons-card {
+          background-image: var(--backgroundImageFile);
+          }
+
+        .person-card-section {
+          font-size: var(--normalFontSize);
+          padding-top: var(--cardTopPadding);
+          padding-bottom: var(--cardBottomPadding);
+          padding-left: var(--cardLeftPadding);
+          padding-right: var(--cardRightPadding);
+          }
+
+        .person-image-div {
+          width: var(--imageDivWidth);
+          flex: var(--personImageDivFlexValue);
+          }
+
+        .person-image {
+          width: var(--imageWidth);
+          }
+
+        .info-div {
+          flex: var(--infoDivFlexValue);
+          }
+
+        .person-info-div {
+          margin-top: var(--infodivTopMargin);
+          margin-bottom: var(--infodivBottomMargin);
+          }
+
+        .person-contact-div {
+          padding-left: var(--personContactDivPaddingLeft);
+          }
+
+        .person-name {
+          font-size: var(--personNameFontSize);
+          }
+
+        .separator {
+          margin-top: var(--separatorMarginTop);
+          margin-bottom: var(--separatorMarginBottom);
+          }
+
+        .icon-style {
+          font-size: var(--iconFontSize);
+          }
+
+        .phone-div {
+          margin-bottom: var(--phonedivBottomMargin);
+          }
+
+        .email-div {
+          display: var(--emailDivDisplayValue);
+        }
+
+        .email-div-full-span {
+          display: var(--emailDivFullSpanDisplayValue);
+        }
+
+/* ***** Variables Application End ***** */
+
 </style>

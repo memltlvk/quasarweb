@@ -7,17 +7,17 @@
       "maxBaseParameterValue": "22",
       "vars": [
         {"var": "backgroundImageFile", "fname": "stringval", "fparams": ["url(\"/assets/personal-card.png\")"]},
-        {"var": "normalFontSize", "fname": "linear", "fparams": [14,0.6,22,0.9,"rem"]},
+        {"var": "normalFontSize", "fname": "linear", "fparams": [14,0.7,22,0.9,"rem"]},
         {"var": "cardTopPadding", "fname": "linear", "fparams": [14,3,22,5,"rem"]},
         {"var": "cardBottomPadding", "fname": "linear", "fparams": [14,3.5,22,5.5,"rem"]},
-        {"var": "cardLeftPadding", "fname": "linear", "fparams": [14,0,22,0,"rem"]},
-        {"var": "cardRightPadding", "fname": "linear", "fparams": [14,0,22,0,"rem"]},
+        {"var": "cardLeftPadding", "fname": "linear", "fparams": [14,1,22,4,"rem"]},
+        {"var": "cardRightPadding", "fname": "linear", "fparams": [14,1,22,4,"rem"]},
         {"var": "imageDivWidth", "fname": "linear", "fparams": [14,4.5,22,7,"rem"]},
-        {"var": "personImageDivFlexValue", "fname": "stringval", "fparams": ["100%"]},
-        {"var": "imageWidth", "fname": "linear", "fparams": [14,4.5,22,7,"rem"]},
+        {"var": "personImageDivFlexValue", "fname": "stringval", "fparams": ["none"]},
         {"var": "infoDivFlexValue", "fname": "stringval", "fparams": ["100%"]},
         {"var": "infodivTopMargin", "fname": "linear", "fparams": [14,1.3,22,2.8,"rem"]},
         {"var": "infodivBottomMargin", "fname": "linear", "fparams": [14,0.7,22,1.7,"rem"]},
+        {"var": "personContactDivPaddingLeft", "fname": "linear", "fparams": [14,0,22,0,"rem"]},
         {"var": "personNameFontSize", "fname": "linear", "fparams": [14,1,22,1.3,"rem"]},
         {"var": "separatorMarginTop", "fname": "linear", "fparams": [14,0,22,0.2,"rem"]},
         {"var": "separatorMarginBottom", "fname": "linear", "fparams": [14,0,22,0.2,"rem"]},
@@ -41,10 +41,10 @@
         {"var": "cardRightPadding", "fname": "linear", "fparams": [22,3,30,4,"rem"]},
         {"var": "imageDivWidth", "fname": "linear", "fparams": [22,4.5,30,7,"rem"]},
         {"var": "personImageDivFlexValue", "fname": "stringval", "fparams": ["30%"]},
-        {"var": "imageWidth", "fname": "linear", "fparams": [22,4.5,30,7,"rem"]},
-        {"var": "infoDivFlexValue", "fname": "stringval", "fparams": ["55%"]},
+        {"var": "infoDivFlexValue", "fname": "stringval", "fparams": ["65%"]},
         {"var": "infodivTopMargin", "fname": "linear", "fparams": [22,0.3,30,0.7,"rem"]},
         {"var": "infodivBottomMargin", "fname": "linear", "fparams": [22,0.3,30,0.7,"rem"]},
+        {"var": "personContactDivPaddingLeft", "fname": "linear", "fparams": [22,1,30,1,"rem"]},
         {"var": "personNameFontSize", "fname": "linear", "fparams": [22,1,30,1.3,"rem"]},
         {"var": "separatorMarginTop", "fname": "linear", "fparams": [22,0,30,0.2,"rem"]},
         {"var": "separatorMarginBottom", "fname": "linear", "fparams": [22,0,30,0.2,"rem"]},
@@ -104,12 +104,6 @@
         "cssClass": "person-image-div",
         "cssProperty": "flex",
         "defaultValue": "none"
-      },
-    "imageWidth":
-      {
-        "cssClass": "person-image",
-        "cssProperty": "width",
-        "defaultValue": "4.5rem"
       },
     "infoDivFlexValue":
       {
